@@ -1,1 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frame Classifier</title>
+    <style>
+        ul {
+            list-style-type: square; /* Change to disc, circle, square, or none */
+        }
+    </style>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <a href="index.html" class="return-button">
+            <button>Return to Index</button>
+        </a>
+        <h1>Real-Time Game Frame Classifier</h1>
+    </header>
+    <section>
+        <h2>Project Overview</h2>
+        <p>For this project, I created and trained a convolutional neural network(cnn) using Torch with the goal of classifying the tone of video game screenshots. 
+        Though intially intending to only deploy the model for inference on individual screenshots, I decided to add real time inference functionality
+        so that predictions could be provided through an overlay over gameplay in real-time.</p>
+        <p>Key libraries used:</p>
+        <ul>
+            <li><strong>Torch</strong>: Used to define, customize, and train the cnn.</li>
+            <li><strong>CV2, MSS, PIL, Pygetwindow:</strong>: Used during live inference for window capture and data handling.</li>
+        </ul>
+    </section>
+    <section>
+        <h2>Data Sources</h2>
+        <p>The data used for training consists of around 900 png images with a source resolution of 3440x1440. 
+          All images were captured by myself via splitting of gameplay recordings across 16 different video games.</p>
+        <p>Images are placed into directories correlating to their depicted tone: "Horror", "Action", or "Scenic".</p>
 
+    </section>
+    <section>
+        <h2>Data Preparation</h2>
+        <p>Torchvision's transforms package provides many transformations to be used on raw images. </p>
+        <p>Transformations applied:</p>
+        <ul>
+            <li><strong>Resize((224,224))</strong>: Resizes the images from 3440x1440 to 224x224. These dimensions were derived from the Imagenet training dataset.</li>
+            <li><strong>ToTensor()</strong>: Transforms image into a tensor. </li>
+            <li><strong>Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])</strong>: Ensures input falls within a certain range. Mean and std parameters derived from Imagenet training dataset.</li>
+          
+        </ul>
+        <p>Parameters derived from <a href="https://pytorch.org/hub/pytorch_vision_resnet/">pytorch</a>.</p>
+        <p>After transforming the dataset, I created train and test sets that were .8 and .2 of the full dataset respectively and defined dataloaders for both.</p>
+    </section>
+    <section>
+        <h2>Model Definition</h2>
+        <p>As stated above, the data used in this analysis is sourced from spotify and genius. The user is prompted to sign in to their spotify account. Doing so brings them to a page which lists
+        all playlists in their account's Spotify library.</p>
+        <img src="images/spotifyanalysis_playlist page.png" alt="playlist page">
+        <p>Spotify user information such as this is fetched using spotipy library functions and their access token which is stored in-session when they sign in.</p>
+        <p>The function that fetches the info and passes it to the HTML appears as:</p>
+        <img src="images/spotifyanalysis playlist code.png" alt="playlist page code">
+        <p>Once 'sp' is defined, the pertinent user information can be accessed from sp.current_user_playlists(). This pattern will remain similar when accessing other spotify info such as the songs within playlists.</p>
+        <p>Once the user has selected a playlist, its songs' data will be collected for analysis.</p>
+        <img src="images/spotifyanalysis analyze 1.png" alt="analyze 1">
+        <p>Within the 'analyze' function, I once again retrieve the access token from the session, refetching it in case the session has expired. Then, defining sp again, I define user information to be stored later,
+        and call the get_playlist_tracks_audio_features() function, which we'll take a closer look at next.</p>
+        <img src="images/spotifyanalysis get_playlist_info 1.png" alt="playlist info 1">
+        <p>Above, I define 'results' using the spotipy playlist_tracks function and the playlist_id passed from the function call. Next, I define tracks from results using the 'items' feature which
+        is where the individual song information lies. Next, I iterate through each 'item'(song) in tracks(playlist songs), checking for missing songs or ids for each song entry and skipping them if encountered.
+        In the case where all information given is valid, I attempt to fetch the song from the SQLite database. If there's a match, the song info is retrieved from the database.</p>
+        <img src="images/spotifyanalysis song in database.png" alt="database fetch">
+        <p>Songs which are not yet in the app's SQLite database will have their information fetched using spotipy and lyricsgenius.
+        The info used will then be stored as a new song entry in the database to hasten runtime if the same song ever appears in other playlists.</p>
+        <p>There is also some processing performed on the data before it is used. To ensure consistency with the datatypes specified in the db schema,
+            I cast numerical attributes as floats, and handle values which can cause errors such as non-english characters in song/artist names, and cases where lyricsgenius lyrics do not exist for a song.
+        In both these cases, the song is not utilized in sentiment analysis, but it's existing attributes can still be viewed later.</p>
+        <img src="images/spotifyanalysis song not in database.png" alt="non-db fetch">
+        <p>Once the song's info has been gathered, it is appended to the 'track_data' dataframe . Once the for loop is completed, track_data will contain all the playlist song_info needed.</p>
+        <img src="images/spotifyanalysis add to dataframe.png" alt="add song to dataframe for analysis">
+
+
+    </section>
+    <section>
+        <h2>Playlist Analysis </h2>
+        <p>Returning to the analysis() function, it now has a dataframe 'df_tracks' which contains all necessary playlist song info. The remainder of the function generates the required visualizations or values that will
+            appear on the analysis page for the user. For illustration purposes, I'm going to perform the analysis on one of my personal playlists. It's a large playlist that I think is going to be middle of the road
+        in sentiment.</p>
+            <p>Operations performed include:</p>
+        <ul>
+            <li>Calculating the overall average polence for the playlist</li>
+            <li>Visualizing the overall playlist polence distribution across all playlists within the app's database
+            <img src="images/spotifyanalysis interplaylist distribution.png" alt="interplaylist dist"></li>
+            <li>Generating a k-means cluster plot for the playlist's songs using two principal components from principal component analysis
+            <img src="images/spotifyanalysis PCA.png" alt="PCA"></li>
+            <li>Creating a heatmap for the playlist features
+            <img src="images/spotifyanalysis heatmap.png" alt="Heatmap"></li>
+            <li>Plotting distributions for the sentiment-related features 'valence', 'polarity', and 'polence' within the selected playlist</li>
+            <li>
+            <img src="images/spotifyanalysis polence dist.png" alt="polence dist">
+            <img src="images/spotifyanalysis valence dist.png" alt="valence dist">
+            <img src="images/spotifyanalysis polarity dist.png" alt="polarity dist"></li>
+            <li>Creating and storing a new playlist item from the current playlist which is stored in the database</li>
+            <li>Dropping dataframe columns that aren't needed</li>
+            <li>Passing all values to the analysis html to be displayed</li>
+        </ul>
+    </section>
+    <section>
+        <h2>Analysis results</h2>
+        <p>Based on this analysis, the playlist mean polence fall's close to the database mean, but is slightly higher. As more playlists are added to the database, this metric
+            will become increasingly interesting to see.</p>
+        <p>Songs which contributed the highest polence values were 'Failed at Math(s)' by Panchiko and 'L.A. NIGHT' by Yasuko Agawa.
+        These two songs are indeed fairly positive. L.A. NIGHT especially is a jazzy, groovy song about the allure of a night in Los Angeles, so I believe it fits very well up near the top.</p>
+        <p>Songs which contributed the lowest polence values were 'Loverboy' by The Marías and Welcome To Heartbreak by Kanye West. Respectively, they are about ending a relationship with a cheating lover
+        and an inability to find true happiness even with a lavish lifestyle, and are both reserved instrumentally. As such, I believe they fit at the bottom of the scale.</p>
+        <p>The cluster visualization is interesting to look at. I know all of these songs, and there are some groupings which I think are reasonable.
+            Cluster 0 in dark blue contains many songs
+        I would personally classify as downtempo, but not necessarily sad. These are songs that sonically might have a tinge of negativity, but are hard to place at times.
+        Cluster 1 in cyan contains songs that are sadder to me. Many slow, longing tracks here; especially love songs. Cluster 2 in yellow contains more upbeat sounding songs. A lot of these
+        are very positive. Not all variance is captured within the two principal components; 46% of the full dataset's variance is represented here, which is something I'll look to improve.
+        Nevertheless, there's still interesting insight to be gained here.</p>
+        <p>Many helper functions are used within the analysis function to accomplish the tasks above, the most complex of which was the PCA k-means clustering plot.
+        I'm not going to go in-depth here as the majority of the tasks were fairly simple, but the code can be viewed in this project's GitHub repository linked in the section below.</p>
+    </section>
+    <section>
+        <h2>Code and Implementation</h2>
+        <p>The source code for this project is available on <a href="https://github.com/Keegodude/Sentify">GitHub</a>. The following files are included:</p>
+        <ul>
+            <li><strong>app.py</strong>: The main Python script for data fetching and analysis.</li>
+            <li><strong>init_db.py</strong>: Script for initializing SQLAlchemy/SQLite database.</li>
+            <li><strong>config.py</strong>: Contains initialization data.</li>
+            <li><strong>requirements.txt</strong>: List of required Python packages.</li>
+        </ul>
+    </section>
+    <section>
+        <h2>Future Work</h2>
+        <p>The sentiment analysis model(WordBlob) providing the polarity measure is very simple and leaves out some context in the lyrics. In addition, many words have no weight when using WordBlob.
+        I'd like to revisit this using a pre-trained model like BERT or a GPT to provide sentiment scores.
+            I'd also like to offer this as a public app so that anyone can use it to analyze their playlists.
+        I believe that this information would be interesting to most. Spotify themselves often provide their own fun analytical tools disguised in entertaining ways.
+        I want to improve the front-end component of the web app. Right now it is fairly barebones.
+            Finally, I'd like to provide some more interactivity in the visualizations that are generated, as well as provide meaningful visualizations for even more components of the playlist
+        </p>
+    </section>
+    <section>
+        <h2>Project Takeaways</h2>
+        <p>As with most projects working with a dataset; I reinforced my skills with handling/preparing data. Since this project's concept was devised from scratch,
+        I had to brainstorm a good amount to come to a conclusion on what I wanted to do. I think this will benefit my ability to come up with plans to handle any prompts I may be given in the future.
+        In using spotipy and lyricsgenius, I now have an understanding of interfacing with an api to retrieve data from those sources. I also reinforced my understanding of other concepts I've used in the past,
+            such as principal component analysis, k-means clustering, and general visualization. </p>
+    </section>
+</body>
+</html>
