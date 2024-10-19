@@ -99,26 +99,21 @@
 
     <section>
         <h2>Future Work</h2>
-        <p></p>
+        <p>I plan on further optimizing parameters for the model. I haven't really experimented with different filter or output channel sizes for the convolutional layers.
+           I could also use average pooling instead of max pooling to see if performance improves. On the data side, I could use different batch sizes when defining the dataloaders and gather more
+           images for training. If I were to do this, I would also like to add more layers to the cnn, as I believe I have the hardware to handle deeper networks.</p>
     </section>
     
     <section>
         <h2>Code and Implementation</h2>
-        <p>The source code for this project is available on <a href="https://github.com/Keegodude/Sentify">GitHub</a>. The following files are included:</p>
-        <ul>
-            <li><strong>app.py</strong>: The main Python script for data fetching and analysis.</li>
-            <li><strong>init_db.py</strong>: Script for initializing SQLAlchemy/SQLite database.</li>
-            <li><strong>config.py</strong>: Contains initialization data.</li>
-            <li><strong>requirements.txt</strong>: List of required Python packages.</li>
-        </ul>
+        <p>The source code for this project is available on <a href="https://github.com/Keegodude/vg-frame-classifier">GitHub</a>.</p>
     </section>
     
     <section>
         <h2>Project Takeaways</h2>
-        <p>As with most projects working with a dataset; I reinforced my skills with handling/preparing data. Since this project's concept was devised from scratch,
-        I had to brainstorm a good amount to come to a conclusion on what I wanted to do. I think this will benefit my ability to come up with plans to handle any prompts I may be given in the future.
-        In using spotipy and lyricsgenius, I now have an understanding of interfacing with an api to retrieve data from those sources. I also reinforced my understanding of other concepts I've used in the past,
-            such as principal component analysis, k-means clustering, and general visualization. </p>
+        <p>This is my first personal project utilizing computer vision. I had learned about convolutional neural networks in class, but hadn't yet implemented my own.
+           After defining my own, I feel that I have a better understanding of how data is prepped for and how it moves through the layers in a cnn. Implementing the real-time
+           element of the model introduced real time inference to me, and I now know how to optimize a torch model for that scenario and capture a video stream for use in a python script.</p>
     </section>
 </body>
 </html>
