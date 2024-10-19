@@ -80,20 +80,24 @@
         <h2>Live Inference</h2>
         <p>Using the libaries cv2, mss, PIL, and pygetwindow, the model can classify frames as they are given in real-time gameplay. The gameplay window is captured, and each frame is processed the same as the training dataset and classified.
            An overlay over the window depicts what the current frame is classified as. </p>
-        <video width="640" height="360" controls>
+        <p></p>
+        <video width="700" height="400" controls>
         <source src="videos/sh3_rtd.mp4" type="video/mp4">
         </video>
         <p>This demo depicts the model classifying gameplay from "Silent Hill 3", a horror game. The model performs well and seems to classify the dimly lit, dingy environment correctly as having a horror tone.</p>
-        <video width="640" height="360" controls>
+        <p></p>
+        <video width="700" height="400" controls>
         <source src="videos/dbz_rtd.mp4" type="video/mp4">
         </video>
         <p>This demo depicts the model classifying gameplay from "Dragon Ball Sparking! Zero, a fighting game. The model shows some shortcomings in this scenario; occasionally, there are some misclassified frames where action scenes
            are labeled scenic.</p>
-        <video width="640" height="360" controls>
+        <p></p>
+        <video width="700" height="400" controls>
         <source src="videos/gmod_rtd.mp4" type="video/mp4">
         </video>
         <p>This demo depicts the model classifying gameplay from "Garry's Mod". The scene contains both dimily lit corridors and well-lit spaces. The model struggles with consistently identifying the bright environment as scenic.
            The brightness of the image may be misconstrued as indicative of action.</p>
+        <p></p>
         <p>The model's performance is satisfactory in horror-leaning environments, but leaves more to be desired when classifying between action and scenic.</p>
     </section>
 
