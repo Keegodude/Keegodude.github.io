@@ -45,20 +45,24 @@
     
     <section>
         <h2>Data Preparation</h2>
-        <p>Torchvision's transforms package provides many transformations to be used on raw images. </p>
+        <p>Torchvision's transforms package provides many transformations to be used on raw images. Initially, the flip and crop transformations weren't included, but were added in an effort to
+           increase the generalizability of the model. They increased the variance of the dataset which lead to performance benefits when predicting frames from games not found in the dataset.</p>
         <p>Transformations applied:</p>
         <ul>
             <li><strong>Resize((224,224))</strong>: Resizes the images from 3440x1440 to 224x224. These dimensions were derived from the Imagenet training dataset.</li>
+            <li><strong>RandomHorizontalFlip(p=0.5)</strong>: Flips a given image horizontally with a probability of .5.</li>
+            <li><strong>RandomVerticalFlip(p=0.5)</strong>: Flips a given image vertically with a probability of .5.</li>
+            <li><strong>RandomResizedCrop(size=224, scale=(0.8, 1.0))</strong>: Crops to a size that is .8 of the source resolution and resizes that crop to full size.</li>
             <li><strong>ToTensor()</strong>: Transforms image into a tensor. </li>
             <li><strong>Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])</strong>: Ensures input falls within a certain range. Mean and std parameters derived from Imagenet training dataset.</li>
         </ul>
         <p>Parameters derived from <a href="https://pytorch.org/hub/pytorch_vision_resnet/">pytorch</a>.</p>
-        <p>After transforming the dataset, I created train and test sets that were .8 and .2 of the full dataset respectively and defined dataloaders for both. Batch sizes are set to 64.</p>
+        <p>After transforming the dataset, I created train and test sets that were .8 and .2 of the full dataset respectively and defined dataloaders for both. Batch sizes are set to 32.</p>
     </section>
     
     <section>
         <h2>Model Definition</h2>
-        <p>The model utilizes three convolutional layers and three fully connected layers. There are also pooling layers following each convolutional layer.
+        <p>The model utilizes three convolutional layers and three fully connected layers. There are also pooling layers following each convolutional layer. 
            It expects an input with a shape [batch_size, 3, 224, 224], where 3 represents the input channels: red, green, and blue in an RGB image, and each 224 represents the input image length and width.</p>
         <img src="images/frameclassifier_Initial model summary.png" alt="model summary">
         <p>The summary above illustrates the transformations applied to a sample input with dimensions [1, 3, 224, 224]</p>
@@ -107,6 +111,25 @@
            I could also use average pooling instead of max pooling to see if performance improves. On the data side, I could use different batch sizes when defining the dataloaders and gather more
            images for training. If I were to do this, I would also like to add more layers to the cnn, as I believe I have the hardware to handle deeper networks.</p>
     </section>
+
+    <section>
+        <h2>Updates (WORK IN PROGRESS)</h2>
+        <p>The makeup of the model went through a few changes from its initial setup in order to improve performance.</p>
+        <p>Initially, the model utilized three convolutional layers and three fully connected layers, with max pooling used after each convolutional layer. This configuration performed
+           well enough on the test set, but struggled to classify certain scenarios correctly. This was especially evident in live inference on games
+           which didn't appear in the training dataset.</p>
+        <p>Considering that the data might not be varied enough to generalize to other games, new transformations were applied:</p>
+        <ul>
+            <li><strong>RandomHorizontalFlip(p=0.5)</strong>: Flips a given image horizontally with a probability of .5.</li>
+            <li><strong>RandomVerticalFlip(p=0.5)</strong>: Flips a given image vertically with a probability of .5.</li>
+            <li><strong>RandomResizedCrop(size=224, scale=(0.8, 1.0))</strong>: Crops to a size that is .8 of the source resolution and resizes that crop to full size.</li>
+        </ul>
+        <p>After training on the new dataset, test accuracies fell from ~92% to ~70%. The model performed considerably worse on more varied data, implying that it was overfitting on the original dataset.</p>
+        <p>With the goal of better capturing features among each class and improving accuracies when using this new dataset, one fully connected and two convolutional layers were added.
+           </p>
+    </section>
+
+    
     
     <section>
         <h2>Code and Implementation</h2>
