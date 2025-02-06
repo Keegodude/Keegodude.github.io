@@ -22,7 +22,7 @@
         <h2>Project Overview</h2>
         <p>This project involves using Spotify's Python API (Spotipy), the Genius API, and Flask to create a web app that performs sentiment analysis on users' specified spotify
             playlists, and explores various data attributes. The goal is to provide users with interesting information about their music in an efficient and insightful way,
-            and gather a broad understanding of sentiment trends in user playlists.</p>
+            and gather a broad understanding of sentiment trends in user playlists. After the application was functional locally, it was migrated to an AWS EC2 instance. </p>
         <p>Key libraries used:</p>
         <ul>
             <li><strong>Spotify API (spotipy)</strong>: Used to fetch playlist data, song details, and audio features.</li>
@@ -78,9 +78,9 @@
         <img src="images/spotifyanalysis get_playlist_info 1.png" alt="playlist info 1">
         <p>Above, I define 'results' using the spotipy playlist_tracks function and the playlist_id passed from the function call. Next, I define tracks from results using the 'items' feature which
         is where the individual song information lies. Next, I iterate through each 'item'(song) in tracks(playlist songs), checking for missing songs or ids for each song entry and skipping them if encountered.
-        In the case where all information given is valid, I attempt to fetch the song from the SQLite database. If there's a match, the song info is retrieved from the database.</p>
+        In the case where all information given is valid, I attempt to fetch the song from the MySQL database. If there's a match, the song info is retrieved from the database.</p>
         <img src="images/spotifyanalysis song in database.png" alt="database fetch">
-        <p>Songs which are not yet in the app's SQLite database will have their information fetched using spotipy and lyricsgenius.
+        <p>Songs which are not yet in the app's MySQL database will have their information fetched using spotipy and lyricsgenius.
         The info used will then be stored as a new song entry in the database to hasten runtime if the same song ever appears in other playlists.</p>
         <p>There is also some processing performed on the data before it is used. To ensure consistency with the datatypes specified in the db schema,
             I cast numerical attributes as floats, and handle values which can cause errors such as non-english characters in song/artist names, and cases where lyricsgenius lyrics do not exist for a song.
@@ -120,7 +120,7 @@
         <p>Based on this analysis, the playlist mean polence fall's close to the database mean, but is slightly higher. As more playlists are added to the database, this metric
             will become increasingly interesting to see.</p>
         <p>Songs which contributed the highest polence values were 'Failed at Math(s)' by Panchiko and 'L.A. NIGHT' by Yasuko Agawa.
-        These two songs are indeed fairly positive. L.A. NIGHT especially is a jazzy, groovy song about the allure of a night in Los Angeles, so I believe it fits very well up near the top.</p>
+        These two songs are indeed fairly positive. L.A. NIGHT especially is a jazzy, groovy song about the romanticized allure of a night in Los Angeles, so I believe it fits very well up near the top.</p>
         <p>Songs which contributed the lowest polence values were 'Loverboy' by The Marías and Welcome To Heartbreak by Kanye West. Respectively, they are about ending a relationship with a cheating lover
         and an inability to find true happiness even with a lavish lifestyle, and are both reserved instrumentally. As such, I believe they fit at the bottom of the scale.</p>
         <p>The cluster visualization is interesting to look at. I know all of these songs, and there are some groupings which I think are reasonable.
@@ -133,11 +133,22 @@
         I'm not going to go in-depth here as the majority of the tasks were fairly simple, but the code can be viewed in this project's GitHub repository linked in the section below.</p>
     </section>
     <section>
+        <h2>AWS migration</h2>
+        <p>As an exercise with cloud-based solutions, I wanted to migrate the application to AWS. Using its provided free tiers, I created an EC2 instance to run the application from
+           and an RDS instance to store the MySQL database of song attributes. The migration consisted of:</p>
+        <ul>
+            <li>Creating the EC2 and RDS instances</li>
+            <li>Managing security groups to allow for the RDS database to be accessible from the EC2 environment</li>
+            <li>Migrating the Python virtual environment and application files from local to the EC2</li>
+            <li>Altering routes within the application and Spotify developer portal to reflect the public ipv4 of the EC2 instead of localhost for testing</li>
+        </ul>
+    </section>
+    <section>
         <h2>Code and Implementation</h2>
         <p>The source code for this project is available on <a href="https://github.com/Keegodude/Sentify">GitHub</a>. The following files are included:</p>
         <ul>
             <li><strong>app.py</strong>: The main Python script for data fetching and analysis.</li>
-            <li><strong>init_db.py</strong>: Script for initializing SQLAlchemy/SQLite database.</li>
+            <li><strong>init_db.py</strong>: Script for initializing SQLAlchemy/MySQL database.</li>
             <li><strong>config.py</strong>: Contains initialization data.</li>
             <li><strong>requirements.txt</strong>: List of required Python packages.</li>
         </ul>
@@ -157,7 +168,7 @@
         <p>As with most projects working with a dataset; I reinforced my skills with handling/preparing data. Since this project's concept was devised from scratch,
         I had to brainstorm a good amount to come to a conclusion on what I wanted to do. I think this will benefit my ability to come up with plans to handle any prompts I may be given in the future.
         In using spotipy and lyricsgenius, I now have an understanding of interfacing with an api to retrieve data from those sources. I also reinforced my understanding of other concepts I've used in the past,
-            such as principal component analysis, k-means clustering, and general visualization. </p>
+            such as principal component analysis, k-means clustering, and general visualization. The migration to AWS was a learning experience for hosting projects using cloud-based solutions.</p>
     </section>
 </body>
 </html>
