@@ -64,10 +64,11 @@ p {
 }
 
 ul {
-    list-style: none;
-    padding: 0;
+    list-style: disc;
+    padding-left: 20px;
     color: #e4e6eb;
 }
+
 
 ul li {
     margin: 10px 0;
@@ -98,4 +99,14 @@ ol {
 .return-button button {
     padding: 10px 20px;
     font-size: 16px;
+}
+
+section img {
+    max-width: 100%;  /* Ensures image scales down to fit */
+    max-height: 400px;
+    height: auto;  /* Maintains aspect ratio */
+    width: auto;
+    display: block;  /* Removes extra spacing below images */
+    margin: 0 auto;  /* Centers images */
+    object-fit: contain;  /* Ensures entire image is visible */
 }

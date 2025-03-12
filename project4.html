@@ -18,129 +18,97 @@
         </a>
         <h1>Real-Time Game Frame Classifier</h1>
     </header>
+
     <section>
         <h2>Project Overview</h2>
-        <p>For this project, I created and trained a convolutional neural network(cnn) using Torch with the goal of classifying the tone of video game screenshots. 
-        Though intially intending to only deploy the model for inference on individual screenshots, I decided to add real time inference functionality
-        so that predictions could be provided through an overlay over gameplay in real-time.</p>
+        <p>For this project, I created and trained a Convolutional Neural Network (CNN) using PyTorch to classify the tone of video game screenshots.
+        Initially, the model was designed for individual image inference, but I later added real-time inference functionality, enabling predictions through an overlay on live gameplay.</p>
         <p>Key libraries used:</p>
         <ul>
-            <li><strong>Torch</strong>: Used to define, customize, and train the cnn.</li>
-            <li><strong>CV2, MSS, PIL, Pygetwindow</strong>: Used during live inference for window capture and data handling.</li>
+            <li><strong>PyTorch</strong>: Used to define, customize, and train the CNN.</li>
+            <li><strong>OpenCV (cv2), MSS, PIL, PyGetWindow</strong>: Used for real-time window capture and data handling.</li>
         </ul>
     </section>
-    
+
     <section>
         <h2>Data Sources</h2>
-        <p>The data used for training consists of around 900 png images with a source resolution of 3440x1440. 
-          All images were captured by myself via splitting of gameplay recordings across 16 different video games.</p>
-        <p>Images are placed into directories correlating to their depicted tone: "Horror", "Action", or "Scenic".</p>
-        <p>The qualifications an image needs for each category:</p>
+        <p>The dataset consists of approximately 900 PNG images with a source resolution of 3440x1440, captured from gameplay recordings across 16 different video games.</p>
+        <p>Images are categorized into three tone-based directories: "Horror," "Action," and "Scenic." The classification criteria are as follows:</p>
         <ul>
-            <li><strong>Horror</strong>: Depicts environment that would inflict some kind of horror in me if I were present.</li>
-            <li><strong>Action</strong>: Action occurring in environment, such as gunshots, explosions, physical striking, impacts, etc.</li>
-            <li><strong>Scenic</strong>: No action occurring, environment depicted is not immediately threatening and is well lit.</li>
+            <li><strong>Horror</strong>: Dark or eerie environments that evoke a sense of fear.</li>
+            <li><strong>Action</strong>: Scenes with gunfire, explosions, physical combat, or other high-intensity events.</li>
+            <li><strong>Scenic</strong>: Well-lit, non-threatening environments with no immediate action.</li>
         </ul>
     </section>
-    
+
     <section>
         <h2>Data Preparation</h2>
-        <p>Torchvision's transforms package provides many transformations to be used on raw images. Initially, the flip and crop transformations weren't included, but were added in an effort to
-           increase the generalizability of the model. They increased the variance of the dataset which lead to performance benefits when predicting frames from games not found in the dataset.</p>
+        <p>Using Torchvision’s <code>transforms</code> package, I applied various transformations to improve model generalizability. Initially, flip and crop transformations were not included, but their addition improved performance on unseen games.</p>
         <p>Transformations applied:</p>
         <ul>
-            <li><strong>Resize((224,224))</strong>: Resizes the images from 3440x1440 to 224x224. These dimensions were derived from the Imagenet training dataset.</li>
-            <li><strong>RandomHorizontalFlip(p=0.5)</strong>: Flips a given image horizontally with a probability of .5.</li>
-            <li><strong>RandomVerticalFlip(p=0.5)</strong>: Flips a given image vertically with a probability of .5.</li>
-            <li><strong>RandomResizedCrop(size=224, scale=(0.8, 1.0))</strong>: Crops to a size that is .8 of the source resolution and resizes that crop to full size.</li>
-            <li><strong>ToTensor()</strong>: Transforms image into a tensor. </li>
-            <li><strong>Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])</strong>: Ensures input falls within a certain range. Mean and std parameters derived from Imagenet training dataset.</li>
+            <li><strong>Resize((224,224))</strong>: Resizes images from 3440x1440 to 224x224, based on ImageNet standards.</li>
+            <li><strong>RandomHorizontalFlip(p=0.5)</strong>: Horizontally flips an image with a 50% probability.</li>
+            <li><strong>RandomVerticalFlip(p=0.5)</strong>: Vertically flips an image with a 50% probability.</li>
+            <li><strong>RandomResizedCrop(size=224, scale=(0.8, 1.0))</strong>: Crops 80% of the original resolution and resizes it.</li>
+            <li><strong>ToTensor()</strong>: Converts images into tensors.</li>
+            <li><strong>Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])</strong>: Normalizes inputs based on ImageNet training statistics.</li>
         </ul>
-        <p>Parameters derived from <a href="https://pytorch.org/hub/pytorch_vision_resnet/">pytorch</a>.</p>
-        <p>After transforming the dataset, I created train and test sets that were .8 and .2 of the full dataset respectively and defined dataloaders for both. Batch sizes are set to 32.</p>
+        <p>After applying transformations, I split the dataset into training (80%) and test (20%) sets and defined DataLoaders with a batch size of 32.</p>
     </section>
-    
+
     <section>
         <h2>Model Definition</h2>
-        <p>The model utilizes three convolutional layers and three fully connected layers. There are also pooling layers following each convolutional layer. 
-           It expects an input with a shape [batch_size, 3, 224, 224], where 3 represents the input channels: red, green, and blue in an RGB image, and each 224 represents the input image length and width.</p>
-        <img src="images/frameclassifier_Initial model summary.png" alt="model summary">
-        <p>The summary above illustrates the transformations applied to a sample input with dimensions [1, 3, 224, 224]</p>
-        <p>Each convolutional layer will increase the number of outputted channels as it applies its filters and extracts features. 
-           Pooling layers will reduce the dimensions of the image while maintaining key information. In this case, the filter size for the pooling layer is 2, so both the image length and width will be halved.
-           Upon reaching the fully connected layers, the output is flattened as fc layers expect a one-dimensional input. The fc layers will make a prediction using this input and return a vector representing a score for each class.</p>
+        <p>The model consists of three convolutional layers, three fully connected layers, and pooling layers after each convolution. The expected input shape is <code>[batch_size, 3, 224, 224]</code>, where 3 represents the RGB channels.</p>
+        <img src="images/frameclassifier_Initial model summary.png" alt="Model Summary">
+        <p>The summary above illustrates transformations applied to a sample input.</p>
     </section>
-    
+
     <section>
         <h2>Training</h2>
-        <p>Currently, training for 5 epochs yields the best results. Cross Entropy Loss and accuracy in both the training and test sets were tracked throughout the process. Adam is used to optimize weights and zero the gradients before 
-           each forward pass. </p>
-        <p>Accuracy and Loss plots:</p>
-        <img src="images/frameclassifier_Initial model acc_plot.png" alt="acc plot">
-        <img src="images/frameclassifier_Initial model loss_plot.png" alt="loss plot">
+        <p>Training for five epochs produced optimal results. Cross-entropy loss and accuracy were tracked throughout the process, using Adam optimization to adjust weights and zero gradients.</p>
+        <p>Accuracy and loss plots:</p>
+        <img src="images/frameclassifier_Initial model acc_plot.png" alt="Accuracy Plot">
+        <img src="images/frameclassifier_Initial model loss_plot.png" alt="Loss Plot">
     </section>
-    
+
     <section>
         <h2>Live Inference</h2>
-        <p>Using the libaries cv2, mss, PIL, and pygetwindow, the model can classify frames as they are given in real-time gameplay. The gameplay window is captured, and each frame is processed the same as the training dataset and classified.
-           An overlay over the window depicts what the current frame is classified as. </p>
-        <p></p>
+        <p>Utilizing OpenCV, MSS, PIL, and PyGetWindow, the model classifies frames in real time. The gameplay window is captured, processed, and classified, with an overlay displaying the results.</p>
+
         <video width="800" height="400" controls>
-        <source src="videos/sh3_rtd.mp4" type="video/mp4">
+            <source src="videos/sh3_rtd.mp4" type="video/mp4">
         </video>
-        <p>This demo depicts the model classifying gameplay from "Silent Hill 3", a horror game. The model performs well and seems to classify the dimly lit, dingy environment correctly as having a horror tone.</p>
-        <p></p>
+        <p>Silent Hill 3 – Correctly identifies horror tone.</p>
+
         <video width="800" height="400" controls>
-        <source src="videos/dbz_rtd.mp4" type="video/mp4">
+            <source src="videos/dbz_rtd.mp4" type="video/mp4">
         </video>
-        <p>This demo depicts the model classifying gameplay from "Dragon Ball Sparking! Zero, a fighting game. The model shows some shortcomings in this scenario; occasionally, there are some misclassified frames where action scenes
-           are labeled scenic.</p>
-        <p></p>
+        <p>Dragon Ball Sparking! Zero – Some action scenes misclassified as scenic.</p>
+
         <video width="800" height="400" controls>
-        <source src="videos/gmod_rtd.mp4" type="video/mp4">
+            <source src="videos/gmod_rtd.mp4" type="video/mp4">
         </video>
-        <p>This demo depicts the model classifying gameplay from "Garry's Mod". The scene contains both dimily lit corridors and well-lit spaces. The model struggles with consistently identifying the bright environment as scenic.
-           The brightness of the image may be misconstrued as indicative of action.</p>
-        <p></p>
-        <p>The model's performance is satisfactory in horror-leaning environments, but leaves more to be desired when classifying between action and scenic.</p>
+        <p>Garry’s Mod – Inconsistent classification of bright environments.</p>
     </section>
 
     <section>
         <h2>Future Work</h2>
-        <p>I plan on further optimizing parameters for the model. I haven't really experimented with different filter or output channel sizes for the convolutional layers.
-           I could also use average pooling instead of max pooling to see if performance improves. On the data side, I could use different batch sizes when defining the dataloaders and gather more
-           images for training. If I were to do this, I would also like to add more layers to the cnn, as I believe I have the hardware to handle deeper networks.</p>
+        <p>Next steps include tuning CNN parameters, experimenting with different pooling methods, and increasing dataset diversity. I also plan to explore deeper architectures leveraging my available hardware.</p>
     </section>
 
     <section>
         <h2>Updates (Ongoing)</h2>
-        <p>The makeup of the model went through a few changes from its initial setup in order to improve performance.</p>
-        <p>Initially, the model utilized three convolutional layers and three fully connected layers, with max pooling used after each convolutional layer. This configuration performed
-           well enough on the test set, but struggled to classify certain scenarios correctly. This was especially evident in live inference on games
-           which didn't appear in the training dataset.</p>
-        <p>Considering that the data might not be varied enough to generalize to other games, new transformations were applied:</p>
-        <ul>
-            <li><strong>RandomHorizontalFlip(p=0.5)</strong>: Flips a given image horizontally with a probability of .5.</li>
-            <li><strong>RandomVerticalFlip(p=0.5)</strong>: Flips a given image vertically with a probability of .5.</li>
-            <li><strong>RandomResizedCrop(size=224, scale=(0.8, 1.0))</strong>: Crops to a size that is .8 of the source resolution and resizes that crop to full size.</li>
-        </ul>
-        <p>After training on the new dataset, test accuracies fell from ~92% to ~70%. The model performed considerably worse on more varied data, implying that it was overfitting on the original dataset.</p>
-        <p>With the goal of better capturing features among each class and improving accuracies when using this new dataset, one fully connected and two convolutional layers were added.
-           </p>
+        <p>To improve generalization, I increased dataset variance, but test accuracy initially dropped from ~92% to ~70%, indicating prior overfitting. To counter this, I added an extra fully connected layer and two additional convolutional layers.</p>
     </section>
 
-    
-    
     <section>
         <h2>Code and Implementation</h2>
-        <p>The source code for this project is available on <a href="https://github.com/Keegodude/vg-frame-classifier">GitHub</a>.</p>
+        <p>Find the source code on <a href="https://github.com/Keegodude/vg-frame-classifier">GitHub</a>.</p>
     </section>
-    
+
     <section>
         <h2>Project Takeaways</h2>
-        <p>This is my first personal project utilizing computer vision. I had learned about convolutional neural networks in class, but hadn't yet implemented my own.
-           After defining my own, I feel that I have a better understanding of how data is prepped for and how it moves through the layers in a cnn. Implementing the real-time
-           element of the model introduced real time inference to me, and I now know how to optimize a torch model for that scenario and capture a video stream for use in a python script.</p>
+        <p>This project was my first hands-on experience with computer vision. Implementing my own CNN deepened my understanding of data preprocessing, model architecture, and real-time inference optimization.</p>
     </section>
 </body>
 </html>

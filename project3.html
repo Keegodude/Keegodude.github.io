@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sentiment Analysis of Spotify Playlists</title>
+    <link rel="stylesheet" href="css/styles.css">
     <style>
         ul {
-            list-style-type: square; /* Change to disc, circle, square, or none */
+            list-style-type: square;
         }
     </style>
-    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     <header>
@@ -18,157 +18,130 @@
         </a>
         <h1>Sentiment Analysis and Data Exploration Spotify Web App</h1>
     </header>
+
     <section>
         <h2>Project Overview</h2>
-        <p>This project involves using Spotify's Python API (Spotipy), the Genius API, and Flask to create a web app that performs sentiment analysis on users' specified spotify
-            playlists, and explores various data attributes. The goal is to provide users with interesting information about their music in an efficient and insightful way,
-            and gather a broad understanding of sentiment trends in user playlists. After the application was functional locally, it was migrated to an AWS EC2 instance. </p>
+        <p>This project uses Spotify's API (Spotipy), the Genius API, and Flask to create a web app that performs sentiment analysis on user-selected Spotify playlists. The goal is to provide insights into playlist sentiment and explore musical attributes. The app was later migrated to an AWS EC2 instance.</p>
         <p>Key libraries used:</p>
         <ul>
-            <li><strong>Spotify API (spotipy)</strong>: Used to fetch playlist data, song details, and audio features.</li>
-            <li><strong>Genius API(lyricsgenius</strong>: Used to fetch song lyrics for sentiment analysis.</li>
+            <li><strong>Spotipy</strong>: Fetches playlist data, song details, and audio features.</li>
+            <li><strong>LyricsGenius</strong>: Retrieves song lyrics for sentiment analysis.</li>
         </ul>
     </section>
+
     <section>
         <h2>Data Sources</h2>
-        <p>The data used for the analysis is selected via the user. It can be any playlist associated with their spotify user account.</p>
-        <p>All playlists selected provide these attributes to be used in analysis:</p>
+        <p>The data for analysis is sourced from the user’s Spotify playlists, providing attributes such as:</p>
         <ul>
-
-            <li>danceability: describes how suitable track is for dancing(based on tempo, rhythm stability, beat strength, and overall regularity</li>
-            <li>energy: measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. Perceptual features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy</li>
-            <li>valence: measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track</li>
-            <li>tempo: estimated tempo of track in beats per minute, i.e. the speed of the track</li>
-            <li>acousticness: confidence measure from 0.0 to 1.0 of whether the track is acoustic</li>
-            <li>instrumentalness: float that predicts whether a song is completely instrumental or not</li>
-            <li>loudness: average loudness in decibels for the overall track</li>
-            <li>speechiness: detects presence of spoken words in track</li>
-
-            <li>polarity: lyrics' polarity. From -1.0 to 1.0 greater values represent positivity. Polarity is normalized and used in polence calculataion as (polarity + 1) / 2</li>
-            <li>word sentiments: provide 5 most positive words and 5 least positive words from lyrics based on polarity</li>
-            <li>polence: ensemble metric representing overall tone of the song incorporating lyrical content and musical feel. Calculated as (.8 * valence) + (.2 * normalized_polarity)</li>
+            <li><strong>Danceability</strong>: Suitability for dancing based on rhythm and tempo.</li>
+            <li><strong>Energy</strong>: Intensity and activity level (0.0 to 1.0).</li>
+            <li><strong>Valence</strong>: Musical positiveness (0.0 to 1.0).</li>
+            <li><strong>Tempo</strong>: Speed in beats per minute.</li>
+            <li><strong>Acousticness</strong>: Probability that a track is acoustic.</li>
+            <li><strong>Instrumentalness</strong>: Likelihood of a track being instrumental.</li>
+            <li><strong>Loudness</strong>: Overall decibel level.</li>
+            <li><strong>Speechiness</strong>: Presence of spoken words.</li>
+            <li><strong>Polarity</strong>: Lyrical sentiment (-1.0 to 1.0, normalized for polence calculation).</li>
+            <li><strong>Word Sentiments</strong>: Top 5 positive and negative words based on polarity.</li>
+            <li><strong>Polence</strong>: An ensemble metric combining valence and normalized polarity.</li>
         </ul>
-
     </section>
-    <section>
-        <h2>App initialization</h2>
-        <p>In order to utilize spotipy in my app, I had to register the app via Spotify's "Spotify for Developers" page. Upon doing so, I was provided with necessary details such as
-        a Spotipy Client ID and Client Secret which allow the app to interact with Spotify's servers. To utilize lyricsgenius, I had to do something similar, which provided me with
-            a Genius API token. After defining my app credentials using these newly attained values, the app now had all the access it needed to fetch the required information for analysis.</p>
-        <img src="images/spotifyanalysis app initialization.png" alt="App init">
-        <p>I decided to also utilize SQLAlchemy to maintain a database of pertinent song information, so the final step I took was to create a database schema and initialize it.</p>
-        <img src="images/spotifyanalysis db init 1.png" alt="db init 1">
-        <img src="images/spotifyanalysis db init 2.png" alt="db init 2">
-        <img src="images/spotifyanalysis db init 3.png" alt="db init 3">
 
-    </section>
     <section>
-        <h2>Data fetching/handling</h2>
-        <p>As stated above, the data used in this analysis is sourced from spotify and genius. The user is prompted to sign in to their spotify account. Doing so brings them to a page which lists
-        all playlists in their account's Spotify library.</p>
+        <h2>App Initialization</h2>
+        <p>To use Spotipy, the app was registered with Spotify for Developers, obtaining a Client ID and Secret. Similarly, a Genius API token was required for lyrics retrieval.</p>
+        <p>Database management is handled using SQLAlchemy, storing the song attributes mentioned previously for efficient access.</p>
+    </section>
+
+    <section>
+        <h2>Data Fetching & Handling</h2>
+        <p>Users sign into their Spotify accounts to select playlists, and Spotipy functions retrieve the playlist's song data. Songs are checked against the MySQL database—if not present, they are fetched and stored.</p>
         <img src="images/spotifyanalysis_playlist page.png" alt="playlist page">
-        <p>Spotify user information such as this is fetched using spotipy library functions and their access token which is stored in-session when they sign in.</p>
-        <p>The function that fetches the info and passes it to the HTML appears as:</p>
-        <img src="images/spotifyanalysis playlist code.png" alt="playlist page code">
-        <p>Once 'sp' is defined, the pertinent user information can be accessed from sp.current_user_playlists(). This pattern will remain similar when accessing other spotify info such as the songs within playlists.</p>
-        <p>Once the user has selected a playlist, its songs' data will be collected for analysis.</p>
-        <img src="images/spotifyanalysis analyze 1.png" alt="analyze 1">
-        <p>Within the 'analyze' function, I once again retrieve the access token from the session, refetching it in case the session has expired. Then, defining sp again, I define user information to be stored later,
-        and call the get_playlist_tracks_audio_features() function, which we'll take a closer look at next.</p>
-        <img src="images/spotifyanalysis get_playlist_info 1.png" alt="playlist info 1">
-        <p>Above, I define 'results' using the spotipy playlist_tracks function and the playlist_id passed from the function call. Next, I define tracks from results using the 'items' feature which
-        is where the individual song information lies. Next, I iterate through each 'item'(song) in tracks(playlist songs), checking for missing songs or ids for each song entry and skipping them if encountered.
-        In the case where all information given is valid, I attempt to fetch the song from the MySQL database. If there's a match, the song info is retrieved from the database.</p>
-        <img src="images/spotifyanalysis song in database.png" alt="database fetch">
-        <p>Songs which are not yet in the app's MySQL database will have their information fetched using spotipy and lyricsgenius.
-        The info used will then be stored as a new song entry in the database to hasten runtime if the same song ever appears in other playlists.</p>
-        <p>There is also some processing performed on the data before it is used. To ensure consistency with the datatypes specified in the db schema,
-            I cast numerical attributes as floats, and handle values which can cause errors such as non-english characters in song/artist names, and cases where lyricsgenius lyrics do not exist for a song.
-        In both these cases, the song is not utilized in sentiment analysis, but it's existing attributes can still be viewed later.</p>
-        <img src="images/spotifyanalysis song not in database.png" alt="non-db fetch">
-        <p>Once the song's info has been gathered, it is appended to the 'track_data' dataframe . Once the for loop is completed, track_data will contain all the playlist song_info needed.</p>
-        <img src="images/spotifyanalysis add to dataframe.png" alt="add song to dataframe for analysis">
-
+        <img src="images/spotifyanalysis tracks table.png" alt="tracks table">
 
     </section>
+
     <section>
-        <h2>Playlist Analysis </h2>
-        <p>Returning to the analysis() function, it now has a dataframe 'df_tracks' which contains all necessary playlist song info. The remainder of the function generates the required visualizations or values that will
-            appear on the analysis page for the user. For illustration purposes, I'm going to perform the analysis on one of my personal playlists. It's a large playlist that I think is going to be middle of the road
-        in sentiment.</p>
-            <p>Operations performed include:</p>
+        <h2>Playlist Analysis</h2>
+        <p>The analysis includes:</p>
         <ul>
-            <li>Calculating the overall average polence for the playlist</li>
-            <li>Visualizing the overall playlist polence distribution across all playlists within the app's database
-            <img src="images/spotifyanalysis interplaylist distribution.png" alt="interplaylist dist"></li>
-            <li>Generating a k-means cluster plot for the playlist's songs using two principal components from principal component analysis
-            <img src="images/spotifyanalysis PCA.png" alt="PCA"></li>
-            <li>Creating a heatmap for the playlist features
-            <img src="images/spotifyanalysis heatmap.png" alt="Heatmap"></li>
-            <li>Plotting distributions for the sentiment-related features 'valence', 'polarity', and 'polence' within the selected playlist</li>
-            <li>
+            <li>Average polence calculation.</li>
+            <li>Playlist polence distribution compared to all database playlists.
+            <br>
+            <img src="images/spotifyanalysis interplaylist distribution.png" alt="interplaylist dist">
+            </li>
+            <li>PCA-based k-means clustering of songs.
+            <br>
+            <img src="images/spotifyanalysis PCA.png" alt="PCA">
+            </li>
+            <li>Feature correlation heatmap.
+            <br>
+            <img src="images/spotifyanalysis heatmap.png" alt="Heatmap">
+            </li>
+            <li>Valence, polarity, and polence distributions.
+            <br>
             <img src="images/spotifyanalysis polence dist.png" alt="polence dist">
-            <img src="images/spotifyanalysis valence dist.png" alt="valence dist">
-            <img src="images/spotifyanalysis polarity dist.png" alt="polarity dist"></li>
-            <li>Creating and storing a new playlist item from the current playlist which is stored in the database</li>
-            <li>Dropping dataframe columns that aren't needed</li>
-            <li>Passing all values to the analysis html to be displayed</li>
+        <img src="images/spotifyanalysis valence dist.png" alt="valence dist">
+        <img src="images/spotifyanalysis polarity dist.png" alt="polarity dist">
+            </li>
         </ul>
+
+
+
+
     </section>
+
     <section>
         <h2>Analysis results</h2>
-        <p>Based on this analysis, the playlist mean polence fall's close to the database mean, but is slightly higher. As more playlists are added to the database, this metric
-            will become increasingly interesting to see.</p>
+        <p>Based on this analysis, the playlist mean polence falls close to the database mean, but is slightly higher.</p>
         <p>Songs which contributed the highest polence values were 'Failed at Math(s)' by Panchiko and 'L.A. NIGHT' by Yasuko Agawa.
         These two songs are indeed fairly positive. L.A. NIGHT especially is a jazzy, groovy song about the romanticized allure of a night in Los Angeles, so I believe it fits very well up near the top.</p>
         <p>Songs which contributed the lowest polence values were 'Loverboy' by The Marías and Welcome To Heartbreak by Kanye West. Respectively, they are about ending a relationship with a cheating lover
-        and an inability to find true happiness even with a lavish lifestyle, and are both reserved instrumentally. As such, I believe they fit at the bottom of the scale.</p>
-        <p>The cluster visualization is interesting to look at. I know all of these songs, and there are some groupings which I think are reasonable.
+        and an inability to find true happiness even with a lavish lifestyle. Both are both reserved instrumentally. As such, I believe they fit at the bottom of the scale.</p>
+        <p>The cluster visualization attempts to find groupings of songs which exhibit similarities in some way.
             Cluster 0 in dark blue contains many songs
-        I would personally classify as downtempo, but not necessarily sad. These are songs that sonically might have a tinge of negativity, but are hard to place at times.
+        I would classify as downtempo, but not necessarily sad. These are songs that might have a tinge of negativity in their composition and lyrical sentiment that could go either way.
         Cluster 1 in cyan contains songs that are sadder to me. Many slow, longing tracks here; especially love songs. Cluster 2 in yellow contains more upbeat sounding songs. A lot of these
-        are very positive. Not all variance is captured within the two principal components; 46% of the full dataset's variance is represented here, which is something I'll look to improve.
-        Nevertheless, there's still interesting insight to be gained here.</p>
-        <p>Many helper functions are used within the analysis function to accomplish the tasks above, the most complex of which was the PCA k-means clustering plot.
-        I'm not going to go in-depth here as the majority of the tasks were fairly simple, but the code can be viewed in this project's GitHub repository linked in the section below.</p>
+        are very positive. Not all variance is captured within the two principal components; 46% of the full dataset's variance is represented here, which is something I'll look to improve.</p>
     </section>
+
     <section>
-        <h2>AWS migration</h2>
-        <p>As an exercise with cloud-based solutions, I wanted to migrate the application to AWS. Using its provided free tiers, I created an EC2 instance to run the application from
-           and an RDS instance to store the MySQL database of song attributes. The migration consisted of:</p>
+        <h2>AWS Migration</h2>
+        <p>The app was migrated to AWS using an EC2 instance for hosting and an RDS instance for database management. The migration consisted of:</p>
         <ul>
             <li>Creating the EC2 and RDS instances</li>
             <li>Managing security groups to allow for the RDS database to be accessible from the EC2 environment</li>
             <li>Migrating the Python virtual environment and application files from local to the EC2</li>
             <li>Altering routes within the application and Spotify developer portal to reflect the public ipv4 of the EC2 instead of localhost for testing</li>
         </ul>
+
     </section>
+
     <section>
-        <h2>Code and Implementation</h2>
-        <p>The source code for this project is available on <a href="https://github.com/Keegodude/Sentify">GitHub</a>. The following files are included:</p>
+        <h2>Code & Implementation</h2>
+        <p>The source code is available on <a href="https://github.com/Keegodude/Sentify">GitHub</a>. Key files include:</p>
         <ul>
-            <li><strong>app.py</strong>: The main Python script for data fetching and analysis.</li>
-            <li><strong>init_db.py</strong>: Script for initializing SQLAlchemy/MySQL database.</li>
-            <li><strong>config.py</strong>: Contains initialization data.</li>
-            <li><strong>requirements.txt</strong>: List of required Python packages.</li>
+            <li><strong>app.py</strong>: Main script for data handling and analysis.</li>
+            <li><strong>init_db.py</strong>: Database initialization.</li>
+            <li><strong>config.py</strong>: Configuration settings.</li>
+            <li><strong>requirements.txt</strong>: Dependencies.</li>
         </ul>
     </section>
+
     <section>
         <h2>Future Work</h2>
-        <p>The sentiment analysis model(WordBlob) providing the polarity measure is very simple and leaves out some context in the lyrics. In addition, many words have no weight when using WordBlob.
-        I'd like to revisit this using a pre-trained model like BERT or a GPT to provide sentiment scores.
-            I'd also like to offer this as a public app so that anyone can use it to analyze their playlists.
-        I believe that this information would be interesting to most. Spotify themselves often provide their own fun analytical tools disguised in entertaining ways.
-        I want to improve the front-end component of the web app. Right now it is fairly barebones.
-            Finally, I'd like to provide some more interactivity in the visualizations that are generated, as well as provide meaningful visualizations for even more components of the playlist
-        </p>
+        <p>Planned improvements:</p>
+        <ul>
+            <li>Using a more advanced sentiment analysis model like BERT.</li>
+            <li>Enhancing the front-end interface.</li>
+            <li>Improving PCA-based clustering accuracy.</li>
+            <li>Hosting the app publicly for wider access.</li>
+        </ul>
     </section>
+
     <section>
         <h2>Project Takeaways</h2>
-        <p>As with most projects working with a dataset; I reinforced my skills with handling/preparing data. Since this project's concept was devised from scratch,
-        I had to brainstorm a good amount to come to a conclusion on what I wanted to do. I think this will benefit my ability to come up with plans to handle any prompts I may be given in the future.
-        In using spotipy and lyricsgenius, I now have an understanding of interfacing with an api to retrieve data from those sources. I also reinforced my understanding of other concepts I've used in the past,
-            such as principal component analysis, k-means clustering, and general visualization. The migration to AWS was a learning experience for hosting projects using cloud-based solutions.</p>
+        <p>This project reinforced data processing, API integration, clustering techniques, and AWS deployment skills.</p>
     </section>
 </body>
 </html>

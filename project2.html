@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Relational Database Project</title>
     <link rel="stylesheet" href="css/styles.css">
+
 </head>
 <body>
     <header>
@@ -13,16 +14,15 @@
         </a>
         <h1>Web Relational Database Using Flask and Python</h1>
     </header>
-    <section>
-        <h2>Project Overview</h2>
-        <p>This project involves the creation of a web relational database application using Flask, Python, and MySQL.
-            The application allows users to perform CRUD (Create, Read, Update, Delete) operations on the database through a web interface.</p>
-    </section>
-    <section>
+    <main>
+        <section>
+            <h2>Project Overview</h2>
+            <p>This project involves the creation of a web relational database application using Flask, Python, and MySQL. The application allows users to perform CRUD (Create, Read, Update, Delete) operations on the database through a web interface.</p>
+        </section>
+
+        <section>
         <h2>Schema Design</h2>
-        <p>The first task I focused on was devising a database schema that could portray a sample music service. The functionality I wanted to implement allowed
-        users to create their own accounts and create playlists to store songs in. I also wanted to allow users to filter the songs in their playlist by interesting metrics.
-        Based on these functionalities, I devised this database schema:</p>
+        <p>A database schema was devised that would accomodate for functionalities such as account creation, playlist creation, and playlist editing.</p>
         <ul>
             <li><strong>Table 1: artists</strong>
                 <ul>
@@ -63,94 +63,56 @@
                 </ul>
             </li>
         </ul>
-        <p>This schema contains all required columns to connect all objects together. Artist and song values such as genre, decade, or country could be used for filtering.</p>
-
     </section>
-    <section>
-        <h2>Initialization</h2>
-        <p>Before implementing the app functionality, I first had to prepare the environment.</p>
-        <p>To begin, I first defined a new Flask app, then created an instance of the database like so:</p>
-        <img src="images/webdatabase init snippet.png" alt="db init">
-        <p>A full database dump .sql file can be found in this project's GitHub repository with the CREATE statements for
-        all other tables.</p>
-        <p>Next, I defined a few helper functions which would make executing queries simpler:</p>
-        <img src="images/webdatabase helpers.png" alt="db init">
 
-    </section>
-    <section>
-        <h2>Implementing CRUD functions</h2>
-        <p>First, the account functionality was implemented:</p>
-        <img src="images/webdatabase account functionality.png" alt="db init">
-        <img src="images/webdatabase signin page.png" alt="Database Schema Image">
-        <img src="images/webdatabase user registration.png" alt="Database Schema Image">
-        <p>Users can create a new account which will insert their provided credentials into the MySQL db so that they can be fetched at sign in.
-        Upon signing in, the user will be taken to a page listing the playlists registered to their account.</p>
-        <img src="images/webdatabase playlist functionality.png" alt="Database Schema Image">
-        <img src="images/webdatabase playlist page.png" alt="Database Schema Image">
-        <p>The user can create a new playlist, or select an existing one. They can add and remove songs from their playlists.</p>
-        <img src="images/webdatabase showsongs.png" alt="Database Schema Image">
-        <img src="images/webdatabase playlist songs page.png" alt="Database Schema Image">
-        <img src="images/webdatabase song functionality.png" alt="Database Schema Image">
+        <section>
+            <h2>Initialization</h2>
+            <p>A Flask app environment and an instance of the database are created:</p>
+            <img src="images/webdatabase init snippet.png" alt="db init">
+            <p>A full database dump .sql file is available on the GitHub repository with the CREATE statements for all other tables.</p>
+        </section>
 
+        <section>
+            <h2>Implementing CRUD functions</h2>
+            <p>The account functionality was implemented, allowing users to create accounts and sign in:</p>
+            <img src="images/webdatabase account functionality.png" alt="Account functionality">
+            <p>Users can create a new account, which stores their credentials in MySQL, and sign in to access their playlists:</p>
+            <img src="images/webdatabase signin page.png" alt="Sign-in page">
+            <p>Once signed in, users can create and manage playlists:</p>
+            <img src="images/webdatabase playlist functionality.png" alt="Playlist functionality">
+        </section>
 
-    </section>
-    <section>
-        <h2>Implementing filtered reports</h2>
-        <p>The final functionality implemented was allowing the user to filter their playlist songs based on certain attributes and generate a report.</p>
-        <p>I opted to use a stored procedure to query the required values from the database.</p>
-        <img src="images/webdatabase stored procedure.png" alt="Database Schema Image">
-        <p>Since the query can filter on many different variables and displays
-        a large amount of data, it is quite large. Storing it separately and calling it within the application makes the code much more readable.</p>
-        <p>Whichever values the user specifies will impact the SQL query which queries the data to be outputted in the report.</p>
-        <img src="images/webdatabase report functionality.png" alt="Database Schema Image">
-        <img src="images/webdatabase filtered view on country UK.png" alt="Database Schema Image">
-        <img src="images/webdatabase filtered view on decade 2020.png" alt="Database Schema Image">
+        <section>
+            <h2>Filtered Reports</h2>
+            <p>The final functionality implemented was allowing users to filter playlist songs based on attributes like genre and decade. A stored procedure was used for querying the data:</p>
+            <img src="images/webdatabase stored procedure.png" alt="Stored procedure">
+        </section>
 
-    </section>
-    <section>
-        <h2>Table Indexing and Transaction Concurrency</h2>
-        <p>After all functionality was implemented, I looked into indexing on certain table columns to enhance runtimes. Based on how frequently
-        certain columns appear within queries, I decided to index on Playlists.PlaylistID, SongID in 'Songs' and 'Playlist_songs', and users.UserID.
-            Playlists.PlaylistID comes up often in where clauses throughout the program.
-            It is used many times to show the user the data from their specific playlists out of all playlists in the database.
-            SongID also comes up often but for joins. It's needed to join playlists and the songs they contain.
-This is necessary for adding/deleting songs from playlists.
-        </p>
-        <p>To ensure that the database was as tuned to the project as it could be, I also looked into how transactions and concurrency.
-            In the application, there's never any interaction between users. Users can't look at other users' playlists.
-            As such, there isn't really any strict need for concurrency, as users only edit their own playlists.
-            There's no risk of one user reading a playlist while the owner edits it, for example. Since this is the case,
-            I wanted to have efficient runtime and as little overhead as possible while still maintaining some data integrity/consistency.
-            Using a Read Committed isolation level made sense in this scenario. It has less overhead than the more strict Repeatable Read and Serializable isolation levels,
-            and achieves a higher level of data consistency compared to Read Uncommitted.</p>
+        <section>
+            <h2>Table Indexing and Transaction Concurrency</h2>
+            <p>To enhance performance, indexing was applied to certain columns like PlaylistID, SongID, and UserID. This reduces query execution time. Additionally, transaction isolation levels were considered to ensure the database maintains integrity.</p>
+        </section>
 
+        <section>
+            <h2>Code</h2>
+            <p>The code for this project is available on <a href="https://github.com/Keegodude/MySQL-Web-DB">GitHub</a>. The following files are included:</p>
+            <ul>
+                <li><strong>main.py</strong>: The main Flask application file.</li>
+                <li><strong>templates/</strong>: Directory containing the HTML templates.</li>
+                <li><strong>CreateReport.sql</strong>: Stored procedure for filtering report data.</li>
+                <li><strong>musicdb_dump.sql</strong>: Database dump to create a copy of the DB.</li>
+            </ul>
+        </section>
 
-    </section>
-    <section>
-        <h2>Code</h2>
-        <p>The code for this project is available on <a href="https://github.com/Keegodude/MySQL-Web-DB">GitHub</a>. The following files are included:</p>
-        <ul>
-            <li><strong>main.py</strong>: The main Flask application file.</li>
-            <li><strong>templates/</strong>: Directory containing the HTML templates.</li>
-            <li><strong>CreateReport.sql/</strong>: Stored procedure responsible for filtering for report functionality</li>
-            <li><strong>musicdb_dump.sql</strong>: Creates a copy of the db used in the app.</li>
-        </ul>
-    </section>
-    <section>
-        <h2>Future Work</h2>
-        <p>This project was mostly undertaken to practice with MySQL and interact with it using Python, but it could provide more
-        genuine use if I were to implement the Spotify API to actually utilize real account details such as playlists.</p>
-        <p>More general future tasks include enhancing the front-end and implementing passwords for user accounts to make them more secure.</p>
+        <section>
+            <h2>Future Work</h2>
+            <p>Future improvements include integrating the Spotify API to fetch real user data and improving the front-end for a better user experience.</p>
+        </section>
 
-    </section>
-    <section>
-        <h2>Project Takeaways</h2>
-        <p>I gained a greater understanding in some regards that can benefit me in future projects.
-            This project was my introduction to Flask and web development in general.
-            I gained an understanding of routing and html design that I hadn't possessed before.
-            I also reinforced my understanding of relational database design and interaction. I now have more experience with
-            how Python and SQL can interact with each other.
-            I hadn't ever sanitized SQL input until doing so in my implementation of C.R.U.D. functions.</p>
-    </section>
+        <section>
+            <h2>Project Takeaways</h2>
+            <p>This project helped me gain a deeper understanding of Flask, web development, relational databases, and SQL injection prevention.</p>
+        </section>
+    </main>
 </body>
 </html>
