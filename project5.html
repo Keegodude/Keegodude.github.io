@@ -17,7 +17,7 @@
 </head>
 <body>
     <header>
-        <a href="{{ url_for('index') }}" class="return-button">
+        <a href="index.html" class="return-button">
             <button>Return to Index</button>
         </a>
         <h1>Chicago Real Estate Web Scraping and Analysis</h1>
@@ -65,10 +65,13 @@
                 </ol>
             </li>
             <li><strong>Collect listing details:</strong> After all urls have been collected, iterate through each, fetch all pertinent details, and append them as a row to a csv.
-                Below is a summary of key statistical measures for the dataset’s numerical columns, generated using the Pandas describe() function.
             </li>
         </ul>
-        <img src="images/real_est_dataset_description.png" alt="df describe">
+        <p>Below is a summary of key statistical measures for the final dataset’s numerical columns, generated using the Pandas describe() function.
+            <br>
+            <img src="images/real_est_dataset_description.png" alt="df describe">
+        </p>
+
     </section>
     <section>
         <h2>Data Mining & Analysis</h2>
