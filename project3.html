@@ -55,7 +55,8 @@
 
     <section>
         <h2>Data Fetching & Handling</h2>
-        <p>Users sign into their Spotify accounts to select playlists, and Spotipy functions retrieve the playlist's song data. Songs are checked against the MySQL database—if not present, they are fetched and stored.</p>
+        <p>Users sign in to their Spotify accounts to select playlists, and Spotipy functions retrieve the playlist's song data. Songs are checked against the MySQL database—if not present, they are fetched and stored.</p>
+        <p>All images that appear throughout this page are based on one of my playlists, <em>Novelty!?</em>.</p>
         <img src="images/spotifyanalysis_playlist page.png" alt="playlist page">
         <img src="images/spotifyanalysis tracks table.png" alt="tracks table">
 
@@ -81,8 +82,8 @@
             <li>Valence, polarity, and polence distributions.
             <br>
             <img src="images/spotifyanalysis polence dist.png" alt="polence dist">
-        <img src="images/spotifyanalysis valence dist.png" alt="valence dist">
-        <img src="images/spotifyanalysis polarity dist.png" alt="polarity dist">
+            <img src="images/spotifyanalysis valence dist.png" alt="valence dist">
+            <img src="images/spotifyanalysis polarity dist.png" alt="polarity dist">
             </li>
         </ul>
 
@@ -93,10 +94,10 @@
 
     <section>
         <h2>Analysis results</h2>
-        <p>Based on this analysis, the playlist mean polence falls close to the database mean, but is slightly higher.</p>
+        <p>Based on this analysis, the playlist mean polence is slightly higher than the database mean.</p>
         <p>Songs which contributed the highest polence values were 'Failed at Math(s)' by Panchiko and 'L.A. NIGHT' by Yasuko Agawa.
-        These two songs are indeed fairly positive. L.A. NIGHT especially is a jazzy, groovy song about the romanticized allure of a night in Los Angeles, so I believe it fits very well up near the top.</p>
-        <p>Songs which contributed the lowest polence values were 'Loverboy' by The Marías and Welcome To Heartbreak by Kanye West. Respectively, they are about ending a relationship with a cheating lover
+        These two songs are indeed fairly positive. 'L.A. NIGHT' especially is a jazzy, groovy song about the romanticized allure of a night in Los Angeles, so I believe it fits very well up near the top.</p>
+        <p>Songs which contributed the lowest polence values were 'Loverboy' by The Marías and 'Welcome To Heartbreak' by Kanye West. Respectively, they are about ending a relationship with a cheating lover
         and an inability to find true happiness even with a lavish lifestyle. Both are both reserved instrumentally. As such, I believe they fit at the bottom of the scale.</p>
         <p>The cluster visualization attempts to find groupings of songs which exhibit similarities in some way.
             Cluster 0 in dark blue contains many songs
@@ -119,7 +120,7 @@
 
     <section>
         <h2>Code & Implementation</h2>
-        <p>The source code is available on <a href="https://github.com/Keegodude/Sentify">GitHub</a>. Key files include:</p>
+        <p>The source code for this project is available on <a href="https://github.com/Keegodude/Sentify">GitHub</a>. Key files include:</p>
         <ul>
             <li><strong>app.py</strong>: Main script for data handling and analysis.</li>
             <li><strong>init_db.py</strong>: Database initialization.</li>
@@ -141,7 +142,9 @@
 
     <section>
         <h2>Project Takeaways</h2>
-        <p>This project reinforced data processing, API integration, clustering techniques, and AWS deployment skills.</p>
+        <p>This project reinforced my understanding of data processing, API integration, and clustering techniques.
+            I'd never used AWS before, so using it to host the app has provided me with a deeper understanding of what
+            AWS entails.</p>
     </section>
 </body>
 </html>
