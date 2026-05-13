@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anomaly Detection in Vehicle Localization Data</title>
+    <title>Volunteer Analyst @ Modern Military Association of America</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -19,11 +19,11 @@
         <p>
             During my time as a volunteer analyst for the Modern Military Association of America, I completed an analysis of the organization's case report data. 
             This involved data cleaning, transformation, visualization, and reporting. The goal was to assist the organization with quantifying their progress towards goals and to help set
-            new, realistic ones.
+            new, realistic ones. This role was essentially a consulting role where I had to meet and discuss with non-technical stakeholders what exactly it was that they wanted out of an analysis, and then provide them with an analysis that fit this bill.
         </p>
     </section>
 
-    <section>
+        <section>
         <h2>Data Quality Assessment and Cleaning</h2>
         <p>
             The data used in the analysis was a csv with each entry representing a respondant's answers given to fill out a google sheet. 
@@ -36,87 +36,54 @@
             <li>Vague/Unclear meaning in responses</li>
             <li>Blank responses</li>
         </ul>
-        <p>
-            Across eight routes, between 200-300 attack trajectories were generated from their respective ground truths.
-            The dataset was derived from the <a href="https://sites.google.com/view/complex-urban-dataset/home?authuser=0">Complex Urban Dataset</a>.
-        </p>
-        <p>Dataset structure visualization:</p>
-        <img src="images/directory_structure.png" alt="Dataset directory structure">
-
-        <h3>Dataset Attributes (28 features)</h3>
-        <ol>
-            <li><strong>time</strong>: Timestamp (seconds per row).</li>
-            <li><strong>x, y, z</strong>: Longitude, latitude (radians), and height (meters).</li>
-            <li><strong>utm_x, utm_y</strong>: Coordinates in UTM format.</li>
-            <li><strong>ve, vn, vu</strong>: Velocity in east, north, and up directions (m/s).</li>
-            <li><strong>pitch, roll, yaw</strong>: Vehicle orientation (Euler angles in radians).</li>
-            <li><strong>qbn_0, qbn_1, qbn_2, qbn_3</strong>: Orientation represented as a quaternion.</li>
-            <li><strong>init_align</strong>: Initial vehicle heading.</li>
-            <li><strong>Standard deviations</strong>: Position, velocity, and orientation (x_sd, y_sd, yaw_sd, etc.).</li>
-        </ol>
     </section>
 
-    <section>
-        <h2>Data Preparation</h2>
+    <h2>Stack and Other Skills</h2>
         <p>
-            To simplify the dataset, we aggregated each CSV using mean values, reducing the dataset from over a million
-            entries to 2,546 rows. We combined attack and ground truth data, labeled them, and used XGBoost's feature
-            importance to retain only eight key features:
-        </p>
-        <ol>
-            <li><strong>vx_sd, z_sd</strong>: Standard deviations of x and z positions.</li>
-            <li><strong>ve, vu</strong>: Velocity in the east and up directions.</li>
-            <li><strong>pitch, roll, yaw</strong>: Euler angle-based vehicle orientation.</li>
-            <li><strong>qbn_3</strong>: Quaternion component representing vehicle orientation.</li>
-        </ol>
-        <p>Final dataset statistical summary:</p>
-        <img src="images/capstonefinaldescribe.png" alt="Final dataset statistics">
-    </section>
-
-    <section>
-        <h2>Modeling</h2>
-        <p>
-            We tested logistic regression, support vector machines, and XGBoost. Initially, XGBoost yielded unexpectedly
-            high test metrics, leading us to investigate class imbalance.
-        </p>
-        <img src="images/capstoneinit_classcounts.png" alt="Class distribution before balancing">
-        <p>
-            To address this, we bootstrapped additional ground truth samples. After balancing, the dataset showed
-            improved performance.
-        </p>
-        <img src="images/capstonefinal_classcounts.png" alt="Class distribution after balancing">
-        <p>Model performance after balancing:</p>
-        <img src="images/capstonefinal initparams metrics.png" alt="Updated model performance metrics">
-    </section>
-
-    <section>
-        <h2>Findings and Performance Evaluation</h2>
-        <img src="images/capstonefinalbestmetrics.png" alt="Final model metrics">
-        <img src="images/capstonefinal_learningcurve.png" alt="Final model learning curves">
-        <p>
-            The optimized XGBoost model successfully identified anomalies, achieving all metrics above 0.9, meeting
-            our performance goal. The most impactful features in identifying cyberattacks were:
+            As this was my first full-time role as an analyst, I spent a lot of time refining my skills with the tools in the company's stack and learned how to work efficiently in an agile, corporate environment.
+          Here are the key tools in the stack as well as how they were used: 
         </p>
         <ul>
-            <li>Velocity standard deviations (vx_sd, z_sd)</li>
-            <li>Velocity in the east and up directions (ve, vu)</li>
-            <li>Vehicle orientation features (roll, qbn_3)</li>
+          
+            <li>Python</li>
+              <ul>
+                <li>
+                    I used the Pandas library in Python to handle data cleaning and preparation. 
+                </li>
+                <li>
+                   As I will mention in the next section, there were many problems with the data quality that needed to be handled before beginning analysis.
+                </li>
+              </ul>
+
+            <li>Powerpoint</li>
+                <ul>
+                <li>
+                    Used to create a presentation for conveying findings to stakeholders.
+                </li>
+                
+              </ul>
+          
+            <li>Power BI</li>
+               <ul>
+                 <li>
+                    Used to explore data as well as create visualizations to be presented in PowerPoint. 
+                </li>
+              </ul>
+            
         </ul>
-    </section>
+    
+
+
+
 
     <section>
-        <h2>Future Work</h2>
+        <h2>Takeaways</h2>
         <p>
-            Potential improvements include expanding the dataset with more real-world ground truth trajectories, reducing
-            reliance on bootstrapping for class balancing.
-        </p>
-    </section>
-
-    <section>
-        <h2>Project Takeaways</h2>
-        <p>
-            This project reinforced my skills in data cleaning, modeling, and handling unstructured datasets.
-            I also gained experience in directing team efforts, designing modeling approaches, and using XGBoost for classification.
+            This role was a great opportunity to test my mettle in providing analysis to another party that wasn't myself, as I had done in my personal projects. 
+            As I mentioned in the overview, I had to consider what the organization really wanted out of an analysis, and ascertain how feasible it was to complete. It was really down to me to narrow down a project scope and deliverables based on what they wanted, since the stakeholders did not have a technical background. I also handled setting up our system of communication and progress upates.
+            Since much of this was up to my discression, I felt a very strong drive to provide an excellent end-product, even moreso considering this was my first analytical output that would be serving a real-world purpose and for a great cause at that.
+            I was extremely pleased when I presented my findings to the stakeholders and was met with resounding satisfactioon with what I'd shown. 
+            Now, I'm much more confident in completing an end-to-end data analysis and creating meaningful deliverables, and trust my work ethic even more. 
         </p>
     </section>
 </body>
