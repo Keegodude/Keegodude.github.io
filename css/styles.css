@@ -110,3 +110,24 @@ section img {
     margin: 0 auto;  /* Centers images */
     object-fit: contain;  /* Ensures entire image is visible */
 }
+
+.resume-button {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.75rem 1.25rem;
+
+    background-color: #2d6cdf;
+    color: white;
+
+    text-decoration: none;
+    border-radius: 6px;
+
+    font-weight: bold;
+
+    transition: background-color 0.2s ease;
+}
+
+.resume-button:hover {
+    background-color: #1f4fa8;
+}
+
